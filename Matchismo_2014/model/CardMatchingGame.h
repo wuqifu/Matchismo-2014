@@ -1,0 +1,22 @@
+//
+//  CardMatchingGame.h
+//  Matchismo_2014
+//
+//  Created by Wuqifu on 14-7-21.
+//  Copyright (c) 2014年 Wuqifu. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+#import "Deck.h"
+#import "Card.h"
+
+@interface CardMatchingGame : NSObject
+
+-(instancetype)initWithCardCount:(NSUInteger)count
+                       usingDeck:(Deck *)deck;
+-(void)chooseCardAtIndex:(NSUInteger)index;
+-(Card *)cardAtIndex:(NSUInteger)index;
+
+@property (nonatomic, readonly) NSInteger score;
+
+@end
