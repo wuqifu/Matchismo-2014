@@ -16,7 +16,10 @@
                        usingDeck:(Deck *)deck;
 -(void)chooseCardAtIndex:(NSUInteger)index;
 -(Card *)cardAtIndex:(NSUInteger)index;
+-(void)restart;
+
 
 @property (nonatomic, readonly) NSInteger score;
+@property (nonatomic, getter = isTwoCardMatchMode) BOOL twoCardMatchMode;
 
 @end
