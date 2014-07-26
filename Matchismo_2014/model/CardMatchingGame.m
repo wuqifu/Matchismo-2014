@@ -39,11 +39,8 @@
                 self = nil;
                 break;
             }
-            
         }
-        
     }
-    
     return self;
 }
 
@@ -53,7 +50,6 @@ static const int COST_TO_CHOOSE = 1;
 
 -(void)chooseCardAtIndex:(NSUInteger)index
 {
-    
     Card *card = [self cardAtIndex:index];
     if (card.isMatched) {
         return;     // already matched, no process needed
@@ -65,8 +61,8 @@ static const int COST_TO_CHOOSE = 1;
         card.chosen = TRUE;
         self.score -= COST_TO_CHOOSE;       // pay for single click
         
-        
         NSMutableArray *chosenCards = [[NSMutableArray alloc] init];
+        
         // match against other chosen cards
         for (Card *otherCard in self.cards) {
             if (otherCard == card) {
@@ -78,34 +74,31 @@ static const int COST_TO_CHOOSE = 1;
                 
                 if ([self isTwoCardMatchMode]) {
                     break;      // found the only other chosen card
+                    
                 }
                 
                 if ([chosenCards count] == 2) {
-                    break;      // found two other chosen card
+                    break;     // found two other chosen card
                 }
             }
         }
         
-        if (([chosenCards count] == 1 && [self isTwoCardMatchMode]) ||
-            (![self isTwoCardMatchMode] && [chosenCards count] == 2)) {
+        if ((chosenCards.count == 1 && self.isTwoCardMatchMode) ||
+            (!self.isTwoCardMatchMode && chosenCards.count == 2)) {
             int matchScore = [card match:chosenCards];
             if (matchScore) {       // match
                 self.score += matchScore * MATCH_BONUS;
-                
-                // mark both cards as matched
                 card.matched = YES;
-                if ([self isTwoCardMatchMode]) {
-                    ((Card *)chosenCards[0]).matched = YES;
-                } else {
-                    ((Card *)chosenCards[0]).matched = YES;
-                    ((Card *)chosenCards[1]).matched = YES;
+                
+                // mark the chosencards as matched
+                for (Card* chosenCard in chosenCards) {
+                    chosenCard.matched = YES;
                 }
-
             } else {                // not match
                 self.score -= MISMATCH_PENALTY;
                 
-                // unchoose the other card
-                ((Card *)chosenCards[0]).chosen = NO;
+                // unchoose the first card.
+                ((Card *)[chosenCards firstObject]).chosen = NO;    // If empty, firstObject return nil do nothing
             }
         }
     }
