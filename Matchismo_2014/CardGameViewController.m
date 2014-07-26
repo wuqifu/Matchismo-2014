@@ -15,6 +15,7 @@
 @property (strong, nonatomic) IBOutletCollection(UIButton) NSArray *cardButtons;
 @property (weak, nonatomic) IBOutlet UILabel *scoreLabel;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *matchModeSegmentedControl;
+@property (weak, nonatomic) IBOutlet UILabel *hintLabel;
 @end
 
 @implementation CardGameViewController
@@ -34,7 +35,7 @@
     if (!_game) {
         _game = [[CardMatchingGame alloc] initWithCardCount:[self.cardButtons count]
                                                    usingDeck:[self createDeck]];
-        }
+    }
     return _game;
 }
 
@@ -47,7 +48,7 @@
     self.matchModeSegmentedControl.enabled = NO;        // disable matchModeSegmentedControl
     
     // Modle logic here
-    int chosenButtonIndex = [self.cardButtons indexOfObject:sender];
+    NSUInteger chosenButtonIndex = [self.cardButtons indexOfObject:sender];
     [self.game chooseCardAtIndex:chosenButtonIndex];
     
     // Update UI: Conroller interpret the Model into the view
@@ -96,6 +97,9 @@
         // update score label
         self.scoreLabel.text = [NSString stringWithFormat:@"Score: %d", self.game.score];
     }
+    
+    // display hint string
+    self.hintLabel.text = self.game.hintString;
 }
 
 // private helper methods

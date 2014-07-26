@@ -19,6 +19,7 @@
 -(void)restart;
 
 
+@property (nonatomic, strong) NSString *hintString;
 @property (nonatomic, readonly) NSInteger score;
 @property (nonatomic, getter = isTwoCardMatchMode) BOOL twoCardMatchMode;
 
