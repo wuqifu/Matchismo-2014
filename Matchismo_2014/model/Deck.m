@@ -52,4 +52,14 @@
     return randomCard;
 }
 
+- (int)cardLeftInDeck
+{
+    return (int)[self.cards count];
+}
+
+- (void)resetDeck
+{
+    [self.cards removeAllObjects];
+}
+
 @end

@@ -16,4 +16,8 @@
 
 - (Card *)drawRandomCard;
 
+- (int)cardLeftInDeck;
+
+- (void)resetDeck;
+
 @end

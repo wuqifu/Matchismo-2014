@@ -13,6 +13,12 @@
 @property (weak, nonatomic) IBOutlet UILabel *flipsLabel;
 @property (nonatomic) int flipCount;
 @property (strong, nonatomic) Deck *deck;
+
+
+@property (strong, nonatomic) IBOutletCollection(UIButton) NSArray *computerCards;
+
+@property (strong, nonatomic) IBOutletCollection(UIButton) NSArray *playerCards;
+
 @end
 
 @implementation CardGameViewController
@@ -31,7 +37,7 @@
 -(void)setFlipCount:(int)flipCount
 {
     _flipCount = flipCount;
-    self.flipsLabel.text = [NSString stringWithFormat:@"Flips: %d", self.flipCount];
+    self.flipsLabel.text = [NSString stringWithFormat:@"Cards Left: %d", self.flipCount];
     NSLog(@"flipcount change to: %d", self.flipCount);
 }
 
@@ -51,6 +57,60 @@
             self.flipCount++;
         }
     }
+}
+
+- (IBAction)resetCards:(id)sender {
+    [self.deck resetDeck];
+    
+    for (UIButton *button in self.computerCards) {
+        [button setBackgroundImage:[UIImage imageNamed:@"cardback"]
+                          forState:UIControlStateNormal];
+        [button setTitle:@""
+                forState:UIControlStateNormal];
+    }
+    
+    for (UIButton *button in self.playerCards) {
+        [button setBackgroundImage:[UIImage imageNamed:@"cardback"]
+                          forState:UIControlStateNormal];
+        [button setTitle:@""
+                forState:UIControlStateNormal];
+    }
+    
+    self.flipCount = [self.deck cardLeftInDeck];    
+}
+
+- (IBAction)startGame:(id)sender {
+    if ([self.deck cardLeftInDeck] <= 0) {
+        NSLog(@"52 Cards are over, need to restart game.");
+        return;
+    }
+    
+    for (UIButton *button in self.computerCards) {
+        Card *card = [self.deck drawRandomCard];
+        if (card != nil) {
+            [button setBackgroundImage:[UIImage imageNamed:@"cardfront"]
+                              forState:UIControlStateNormal];
+            [button setTitle:card.contents
+                    forState:UIControlStateNormal];
+        }
+    }
+    
+    for (UIButton *button in self.playerCards) {
+        Card *card = [self.deck drawRandomCard];
+        if (card != nil) {
+            [button setBackgroundImage:[UIImage imageNamed:@"cardfront"]
+                              forState:UIControlStateNormal];
+            [button setTitle:card.contents
+                    forState:UIControlStateNormal];
+        }
+    }
+    
+    self.flipCount = [self.deck cardLeftInDeck];
+}
+
+- (IBAction)guessBigger:(id)sender {
+}
+- (IBAction)guessLower:(id)sender {
 }
 
 @end
