@@ -81,7 +81,7 @@
 {
     // cycle through all the card buttons base on the corresponding card in Model
     for (UIButton *cardButton in self.cardButtons) {
-        int cardButtonIndex = [self.cardButtons indexOfObject:cardButton];
+        NSUInteger cardButtonIndex = [self.cardButtons indexOfObject:cardButton];
         Card *card = [self.game cardAtIndex:cardButtonIndex];
         
         // set title and background for single card button
@@ -95,7 +95,7 @@
         cardButton.enabled = !card.matched;
         
         // update score label
-        self.scoreLabel.text = [NSString stringWithFormat:@"Score: %d", self.game.score];
+        self.scoreLabel.text = [NSString stringWithFormat:@"Score: %ld", (long)self.game.score];
     }
     
     // display hint string
