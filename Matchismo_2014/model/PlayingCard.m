@@ -10,18 +10,44 @@
 
 @implementation PlayingCard
 
+-(int)match:(NSArray *)otherCards
+{
+    int score = 0;
+    
+    if ([otherCards count] == 1) {              // two-cards-match-model
+        PlayingCard *otherCard = [otherCards firstObject];
+        if (otherCard.rank == self.rank) {
+            score = 4;
+        } else if ([otherCard.suit isEqualToString:self.suit]) {
+            score = 1;
+        }
+    } else if([otherCards count] == 2) {        // three-cards-match-model
+        PlayingCard *firstCard  = otherCards[0];
+        PlayingCard *secondCard = otherCards[1];
+        
+        // let's make one simple algorithm
+        if (firstCard.rank == self.rank || secondCard.rank == self.rank || firstCard.rank == secondCard.rank) {
+            score = 2;
+        } else if ([firstCard.suit isEqualToString:self.suit] || [secondCard.suit isEqualToString:self.suit] || [firstCard.suit isEqualToString:secondCard.suit]) {
+            score = 1;
+        }
+    }
+    
+    return score;
+}
+
 - (NSString *)contents
 {
     NSArray *rankStrings = [PlayingCard rankStrings];
     return [rankStrings[self.rank] stringByAppendingString:self.suit];
 }
 
-@synthesize suit = _suit;
-
 + (NSArray *)validSuits
 {
     return @[@"♠", @"♣", @"♥", @"♦"];
 }
+
+@synthesize suit = _suit;
 
 - (void)setSuit:(NSString *)suit
 {
