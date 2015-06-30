@@ -8,19 +8,35 @@
 
 #import "CardGameViewController.h"
 #import "PlayingCardDeck.h"
+#import "CardMatchingGame.h"
 
 @interface CardGameViewController ()
-@property (weak, nonatomic) IBOutlet UILabel *flipsLabel;
-@property (nonatomic) int flipCount;
-@property (strong, nonatomic) Deck *deck;
+@property (strong, nonatomic) CardMatchingGame *game;       // Model
+@property (strong, nonatomic) IBOutletCollection(UIButton) NSArray *cardButtons;
+@property (weak, nonatomic) IBOutlet UILabel *scoreLabel;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *matchModeSegmentedControl;
+@property (weak, nonatomic) IBOutlet UILabel *hintLabel;
 @end
 
 @implementation CardGameViewController
 
--(Deck *)deck
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    self.matchModeSegmentedControl.selectedSegmentIndex = 0;
+    [self.game setTwoCardMatchMode:YES];
+    [self.matchModeSegmentedControl addTarget:self
+                                       action:@selector(selectedSegmentDidChange:)
+                             forControlEvents:UIControlEventValueChanged];
+}
+
+-(CardMatchingGame *)game
 {
-    if (!_deck) _deck = [self createDeck];
-    return _deck;
+    if (!_game) {
+        _game = [[CardMatchingGame alloc] initWithCardCount:[self.cardButtons count]
+                                                   usingDeck:[self createDeck]];
+    }
+    return _game;
 }
 
 - (Deck *)createDeck
@@ -28,29 +44,73 @@
     return [[PlayingCardDeck alloc] init];
 }
 
--(void)setFlipCount:(int)flipCount
-{
-    _flipCount = flipCount;
-    self.flipsLabel.text = [NSString stringWithFormat:@"Flips: %d", self.flipCount];
-    NSLog(@"flipcount change to: %d", self.flipCount);
+- (IBAction)touchCardButton:(UIButton *)sender {
+    self.matchModeSegmentedControl.enabled = NO;        // disable matchModeSegmentedControl
+    
+    // Modle logic here
+    NSUInteger chosenButtonIndex = [self.cardButtons indexOfObject:sender];
+    [self.game chooseCardAtIndex:chosenButtonIndex];
+    
+    // Update UI: Conroller interpret the Model into the view
+    [self updateUI];
 }
 
-- (IBAction)touchCardButton:(UIButton *)sender {
-    if ([sender.currentTitle length]) {
-        [sender setBackgroundImage:[UIImage imageNamed:@"cardback"]
-                          forState:UIControlStateNormal];
-        [sender setTitle:@"" forState:UIControlStateNormal];
-        self.flipCount++;
+- (IBAction)gameReset {
+    self.game = nil;
+    [self.game restart];
+    self.matchModeSegmentedControl.enabled = YES;
+    
+    [self updateUI];
+}
+
+- (void)selectedSegmentDidChange:(UISegmentedControl *)segmentedControl {
+    NSInteger index = [segmentedControl selectedSegmentIndex];
+    
+    if (index == 0) {
+        // two-card-match-mode
+        NSLog(@"two-card-match-mode");
+        [self.game setTwoCardMatchMode:YES];
     } else {
-        Card *card = [self.deck drawRandomCard];
-        if (card != nil) {
-            [sender setBackgroundImage:[UIImage imageNamed:@"cardfront"]
-                              forState:UIControlStateNormal];
-            [sender setTitle:card.contents
-                    forState:UIControlStateNormal];
-            self.flipCount++;
-        }
+        // three-card-match-mode
+        NSLog(@"three-card-match-mode");
+        [self.game setTwoCardMatchMode:NO];
     }
+}
+
+-(void)updateUI
+{
+    // cycle through all the card buttons base on the corresponding card in Model
+    for (UIButton *cardButton in self.cardButtons) {
+        NSUInteger cardButtonIndex = [self.cardButtons indexOfObject:cardButton];
+        Card *card = [self.game cardAtIndex:cardButtonIndex];
+        
+        // set title and background for single card button
+        NSString *cardTitle = [CardGameViewController titleForCard:card];
+        [cardButton setTitle:cardTitle forState:UIControlStateNormal];
+        
+        UIImage *cardImage = [CardGameViewController backgroundImageForCard:card] ;
+        [cardButton setBackgroundImage:cardImage forState:UIControlStateNormal];
+        
+        // disable card button since already matched
+        cardButton.enabled = !card.matched;
+        
+        // update score label
+        self.scoreLabel.text = [NSString stringWithFormat:@"Score: %ld", (long)self.game.score];
+    }
+    
+    // display hint string
+    self.hintLabel.text = self.game.hintString;
+}
+
+// private helper methods
++(NSString *)titleForCard:(Card *)card
+{
+    return card.isChosen ? card.contents : @"";
+}
+
++(UIImage *)backgroundImageForCard:(Card *)card
+{
+    return [UIImage imageNamed:card.isChosen ? @"cardfront" : @"cardback"];
 }
 
 @end
